@@ -1,0 +1,25 @@
+<?php
+
+/**
+* Insert wordpress shortcode.
+*
+* @author Rômulo Batista
+* @category WordPress
+* @package moca_bonita\wp
+* @copyright Copyright (c) 2015-2016 Núcleo de Tecnologia da Informação - NTI, Universidade Estadual do Maranhão - UEMA
+*/
+
+class WPShortCode {
+
+	/**
+    * Add a shortcode to wp
+    * 
+    * @param string $shortCode The shortcode to be called
+    * @param object $object The object to treat the shortcode call
+    * @param method $method The callback method
+    */
+	public static function addShortCode($shortCode, $object, $method){
+		add_shortcode($shortCode, array($object, $method));
+	}
+	
+}

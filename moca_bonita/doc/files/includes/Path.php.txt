@@ -1,0 +1,112 @@
+<?php
+
+define('plg_name', explode('/',  plugin_basename(__FILE__))[0]);
+define('plugin', ABSPATH . 'wp-content/plugins/' . plg_name);
+define('plg_view', ABSPATH . 'wp-content/plugins/' . plg_name . '/view/');
+define('plg_controller', ABSPATH . 'wp-content/plugins/' . plg_name . '/controller/');
+define('plg_model', ABSPATH . 'wp-content/plugins/' . plg_name . '/model/');
+define('plg_includes', ABSPATH . 'wp-content/plugins/' . plg_name . '/includes/');
+define('plg_js', ABSPATH . 'wp-content/plugins/' . plg_name . '/js/');
+define('plg_css', ABSPATH . 'wp-content/plugins/' . plg_name . '/css/');
+define('plg_images', ABSPATH . 'wp-content/plugins/' . plg_name . '/images/');	
+define('plg_fonts', ABSPATH . 'wp-content/plugins/' . plg_name . '/fonts/');
+define('moca_bonita', ABSPATH . 'wp-content/plugins/' . plg_name . '/moca_bonita/');	
+define('mb_controller', ABSPATH . 'wp-content/plugins/' . plg_name . '/moca_bonita/controller/');
+define('mb_model', ABSPATH . 'wp-content/plugins/' . plg_name . '/moca_bonita/model/');
+define('mb_includes', ABSPATH . 'wp-content/plugins/' . plg_name . '/moca_bonita/includes/');
+
+/**
+* Find framework and plugin files.
+*
+* @author Rômulo Batista
+* @category WordPress
+* @package moca_bonita\util
+* @copyright Copyright (c) 2015-2016 Núcleo de Tecnologia da Informação - NTI, Universidade Estadual do Maranhão - UEMA
+*/
+
+class Path {
+	/**
+    * Constant that defines the used plugin path
+    * 
+    * @var string
+    */	
+	const PLUGIN = plugin;
+
+	/**
+    * Constant that defines the plugin directory view files
+    * 
+    * @var string
+    */
+	const PLGVIEW = plg_view;
+
+	/**
+    * Constant that defines the plugin directory controller files
+    * 
+    * @var string
+    */
+	const PLGCONTROLLER = plg_controller;
+
+	/**
+    * Constant that defines the plugin directory model files
+    * 
+    * @var string
+    */
+	const PLGMODEL = plg_model;
+
+	/**
+    * Constant that defines the plugin included view files
+    * 
+    * @var string
+    */
+	const PLGINCLUDES = plg_includes;
+
+	/**
+    * Constant that defines the plugin javascript files
+    * 
+    * @var string
+    */
+	const PLGJS = plg_js;
+
+	/**
+    * Constant that defines the plugin directory style files
+    * 
+    * @var string
+    */
+	const PLGCSS = plg_css;
+
+	/**
+    * Constant that defines the plugin directory image files
+    * 
+    * @var string
+    */
+	const PLGIMAGES = plg_images;
+
+	/**
+    * Constant that defines the Moca Bonita directory
+    * 
+    * @var string
+    */
+	const MOCABONITA = moca_bonita;
+
+	/**
+    * Constant that defines the Moca Bonita controller directory
+    * 
+    * @var string
+    */
+	const MBCONTROLLER = mb_controller;
+
+	/**
+    * Constant that defines the Moca Bonita model directory
+    * 
+    * @var string
+    */
+	const MBMODEL = mb_model;
+
+	/**
+    * Constant that defines the Moca Bonita includes directory
+    * 
+    * @var string
+    */
+	const MBINCLUDES = mb_includes;
+}
+

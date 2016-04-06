@@ -1,0 +1,25 @@
+{
+  "name": "SPS Uema",
+  "description": "Um plugin wordpress para o Sistema de Processo Seletivo",
+  "license": "GPLv2",
+  "authors": [
+    {
+      "name": "Jhordan Lima",
+      "email": "jhordanlima.uema.dpd@gmail.com"
+    },
+    {
+      "name" : "Alfredo Oliveira",
+      "email" : "alfredooliveira.uema.dpd@gmail.com"
+    },
+    {
+      "name" : "Pablo Santos",
+      "email" : "pablosantos.uema.dpd@gmail.com"
+    }
+  ],
+  "autoload": {
+    "psr-4": {
+      "MocaBonita\\" : "moca_bonita",
+      "SPS\\" : "./"
+    }
+  }
+}

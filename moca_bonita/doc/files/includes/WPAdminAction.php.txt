@@ -1,0 +1,79 @@
+<?php
+
+require_once(Path::MBINCLUDES . 'wp/WPAction.php');
+
+/**
+* Deal with actions that'll be performed.
+*
+* Every action performed or requested in admin pages has its own todo. Every post action through will be treaten based on the chosen todo, that will be treated with the controller chose.
+*
+* @author Rômulo Batista
+* @category WordPress
+* @package moca_bonita\action
+* @copyright Copyright (c) 2015-2016 Núcleo de Tecnologia da Informação - NTI, Universidade Estadual do Maranhão - UEMA
+*/
+
+class WPAdminAction {
+	/**
+    * Instance of the class
+    * 
+    * @var string
+    */
+	private static $instance;
+	/**
+    * Actions to be taken
+    * 
+    * @var string
+    */
+	private $actions;
+
+	/**
+    * Class constructor
+    * 
+    */
+	private function __construct(){
+		$this->actions = array();
+	}
+
+	/**
+    * Clone cannot be allowed
+    * 
+    */
+	public function __clone(){
+        trigger_error('Clone is not allowed.', E_USER_ERROR);
+    }
+
+    /**
+    * Retrieve a unique instance
+    * 
+    */
+	public static function singleton(){
+		if(!isset(self::$instance)){
+			$c = __CLASS__;
+			self::$instance = new $c;
+		}
+
+		return self::$instance;
+	}
+
+	/**
+    * Add actions to wp
+    * 
+    * @param array $actions The array of actions to be performed
+    * @param object $main The main object that will treat the actions
+    */
+	public function addActions($actions, $main){
+		if(!is_object($main))
+			throw new Exception("The variable is not an object.", 1);
+		if(!is_array($actions))
+			throw new Exception("The variable is not an anrray.", 1);
+
+		if(is_array($actions) && is_object($main)){
+			for($i=0; $i<sizeof($actions); $i++){
+	        	WPAction::addAction('admin_post_' . $actions[$i], $main, 'doAction');
+	            WPAction::addAction('wp_ajax_' . $actions[$i], $main, 'doAction');
+	        }
+		}			
+	}
+	
+}
