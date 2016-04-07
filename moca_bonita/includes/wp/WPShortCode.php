@@ -1,6 +1,7 @@
 <?php
 namespace MocaBonita\includes\wp;
 use MocaBonita\controller\Controller;
+use MocaBonita\view\View;
 
 /**
 * Insert wordpress shortcode.
@@ -33,12 +34,50 @@ class WPShortCode {
 		];
 	}
 
-    public static function processShortCode(WPCode $wpCode){
+    public static function processShortCode(WPCode $wpCode, array $plugin){
         foreach(self::$shortCodes as &$shortCode)
-            add_shortcode($shortCode['shortcode'], function() use ($shortCode, $wpCode){
+            add_shortcode($shortCode['shortcode'], function($atts, $content, $tag) use ($shortCode, $wpCode, $plugin){
+                $wpCode->addStyle('plugin');
+                $wpCode->addJS('plugin');
                 $wpCode->addStyle($shortCode['todo']);
                 $wpCode->addJS($shortCode['todo']);
-                $shortCode['object']->$shortCode['method']();
+                $page = $shortCode['method'];
+                $shortCode['method'] = "{$shortCode['method']}Shortcode";
+
+                if(method_exists($shortCode['object'], $shortCode['method'])){
+                    $shortCode['object']->setRequestMethod($plugin['requestMethod']);
+                    $shortCode['object']->setRequestParams($plugin['requestParams']);
+                    $shortCode['object']->setIsAdmin($plugin['isAdmin']);
+                    $shortCode['object']->setIsShortcode(true);
+                    $shortCode['object']->getView()->setTemplate('shortcode');
+                    $shortCode['object']->getView()->setPage('shortcode');
+                    $shortCode['object']->getView()->setAction($page);
+
+                    ob_start();
+                    $res = $shortCode['object']->$shortCode['method']($atts, $content, $tag);
+                    $_content = ob_get_contents();
+                    ob_end_clean();
+
+                    if($_content != "")
+                        error_log($_content);
+
+                    $res = is_null($res) ? $shortCode['object']->getView() : $res;
+
+                    if($res instanceof View)
+                        $res->render();
+                    elseif(is_string($res))
+                        echo $res;
+                    else
+                        echo "Nenhum conteudo foi retornado!";
+
+                } else {
+                    echo $plugin['messages']['invalid_shortcode'];
+                    echo "<br>";
+                    if($plugin['isDevelopment'])
+                        echo "Shortcode: {$shortCode['shortcode']}; Method: {$shortCode['method']}; Todo: {$shortCode['todo']}.";
+                }
+
+
             });
     }
 

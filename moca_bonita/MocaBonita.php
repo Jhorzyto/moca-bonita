@@ -72,24 +72,52 @@ final class MocaBonita extends HTTPService
     protected $isPluginPage;
 
     /**
+     * Development page boolean
+     *
+     * @var boolean
+     */
+    public $isDevelopment;
+
+
+    /**
      * Class constructor
+     * @param boolean $isDevelopment Development page boolean
      *
      */
-    public function __construct()
+    public function __construct($isDevelopment = false)
     {
         parent::__construct();
         $this->wpMenu = new WPMenu();
         $this->wpCode = new WPCode();
         $this->action = WPAdminAction::singleton();
         $this->todo = new TODO();
-        $this->messages = [
-            'controller_not_found' => "O controller {$this->currentPage} não foi adicionado na lista de todo!",
-            'controller_invalid' => "O controller {$this->currentPage} não atende aos requisitos!",
-            'page_not_defined_actions' => "O todo {$this->currentPage} não tem nenhum action de post/put/delete!",
-            'action_not_defined' => "O action {$this->currentAction} da página {$this->currentPage} não foi definido em action de post/put/delete!",
-            'actions_without_permission' => "O action {$this->currentAction} requer acesso admin!",
-            'actions_invalid_request' => "O action {$this->currentAction} requer acesso ajax!",
-        ];
+        $this->isDevelopment = $isDevelopment;
+
+        if($isDevelopment)
+            $this->messages = [
+                'controller_not_found' => "O controller {$this->currentPage} não foi adicionado na lista de todo!",
+                'controller_invalid' => "O controller {$this->currentPage} não extendeu a controller do Moca Bonita!",
+                'page_not_defined_actions' => "O todo {$this->currentPage} não tem nenhum action de get/post/put/delete!",
+                'action_not_defined' => "O action {$this->currentAction} da página {$this->currentPage} não foi definido em action de get/post/put/delete!",
+                'actions_without_permission' => "O action {$this->currentAction} requer acesso admin do wordpress!",
+                'actions_invalid_type' => "O action {$this->currentAction} precisa ser requisitado via ajax!",
+                'actions_invalid_request' => "O action {$this->currentAction} não permite esse tipo de requisição http!",
+                'actions_not_found' => "O action {$this->currentAction}Action não existe no controller do todo {$this->currentPage}!",
+                'invalid_shortcode' => "A action desse shortcode é inválida!",
+            ];
+        else
+            $this->messages = [
+                'controller_not_found' => "Esta pagina nao foi definida!",
+                'controller_invalid' => "Esta pagina nao possui a configuraçao recomendada!",
+                'page_not_defined_actions' => "As açoes dessa pagina nao foram definidas",
+                'action_not_defined' => "Esta açao nao foi definida para esta pagina",
+                'actions_without_permission' => "Voce precisa esta logado para acessar esta açao!",
+                'actions_invalid_type' => "Esta requisiçao precisa ser executada via Ajax!",
+                'actions_invalid_request' => "Esta requisiçao nao e permitida para esta açao",
+                'actions_not_found' => "Esta açao nao foi encontrada!",
+                'invalid_shortcode' => "Esta ação nao foi encontrada!",
+            ];
+
     }
 
     /**
@@ -98,7 +126,7 @@ final class MocaBonita extends HTTPService
      */
     public function changeMessage($key, $message)
     {
-        if(is_string($key) && isset($this->messages[$key]) && is_string($message))
+        if(is_string($key) && is_string($message))
             $this->messages[$key] = $message;
     }
 
@@ -113,18 +141,33 @@ final class MocaBonita extends HTTPService
         $this->wpCode->addStyle('*');
         $this->wpCode->addJS('*');
 
+        if($this->isPluginPage()){
+            $this->wpCode->addStyle('plugin');
+            $this->wpCode->addJS('plugin');
+        }
+
         $this->wpCode->addStyle($this->currentPage);
         $this->wpCode->addJS($this->currentPage);
 
         if ($this->isAdmin == 1) {
-            WPAction::addAction("admin_post_{$this->currentAction}", $this, 'getContent');
-            WPAction::addAction("wp_ajax_{$this->currentAction}", $this, 'getContent');
+            if($this->isAjax == 1)
+                WPAction::addAction("wp_ajax_{$this->currentAction}", $this, 'getContent');
+            else
+                WPAction::addAction("admin_post_{$this->currentAction}", $this, 'getContent');
         } else {
-            WPAction::addAction("admin_post_nopriv_{$this->currentAction}", $this, 'getContent');
-            WPAction::addAction("wp_ajax_nopriv_{$this->currentAction}", $this, 'getContent');
+            if($this->isAjax == 1)
+                WPAction::addAction("wp_ajax_nopriv_{$this->currentAction}", $this, 'getContent');
+            else
+                WPAction::addAction("admin_post_nopriv_{$this->currentAction}", $this, 'getContent');
         }
 
-        WPShortCode::processShortCode($this->wpCode);
+        WPShortCode::processShortCode($this->wpCode, [
+            'requestMethod' => $this->requestMethod,
+            'requestParams' => $this->qs,
+            'isAdmin' => $this->isAdmin,
+            'messages' => $this->messages,
+            'isDevelopment' => $this->isDevelopment,
+        ]);
     }
 
     /**
@@ -146,7 +189,7 @@ final class MocaBonita extends HTTPService
             elseif (!$this->controller instanceof Controller)
                 throw new MBException($this->messages['controller_invalid']);
 
-            elseif (!$this->isGET()) {
+            elseif (!$this->isGET() || $this->currentAction != 'index') {
 
                 $_actionsPost = $this->action->getActions($this->currentPage);
 
@@ -158,47 +201,60 @@ final class MocaBonita extends HTTPService
                 if (!$_actionAttr)
                     throw new MBException($this->messages['action_not_defined']);
 
+                $_actionAttr['action']  = "{$this->currentAction}Action";
+                $_actionAttr['request'] = strtoupper($_actionAttr['request']);
+
                 if ($_actionAttr['admin'] && $this->isAdmin != 1)
                     throw new MBException($this->messages['actions_without_permission']);
 
                 elseif ($_actionAttr['type'] == 'ajax' && $this->isAjax != 1)
+                    throw new MBException($this->messages['actions_invalid_type']);
+
+                elseif($_actionAttr['request'] != $this->requestMethod && $_actionAttr['request'] != '*')
                     throw new MBException($this->messages['actions_invalid_request']);
-            }
 
-            $this->wpCode->addStyle('*');
-            $this->wpCode->addJS('*');
+                elseif(!method_exists($this->controller, $_actionAttr['action']))
+                    throw new MBException($this->messages['actions_not_found']);
 
-            return $this->doAction();
+            } else
+                $_actionAttr = [
+                    'action'  => 'indexAction',
+                    'type'    => 'html',
+                    'admin'   => true,
+                    'request' => 'GET',
+                ];
+
+            $this->controller->setRequestMethod($this->requestMethod);
+            $this->controller->setRequestData($this->content);
+            $this->controller->setRequestParams($this->qs);
+            $this->controller->setCurrentPage($this->currentPage);
+            $this->controller->setCurrentAction($this->currentAction);
+            $this->controller->setIsAdmin($this->isAdmin);
+            $this->controller->setIsAjax($this->isAjax);
+            $this->controller->getView()->setPage($this->currentPage);
+            $this->controller->getView()->setAction($this->currentAction);
+
+            ob_start();
+            $res = $this->controller->$_actionAttr['action']();
+            $_content = ob_get_contents();
+            ob_end_clean();
+
+            if($_content != "")
+                error_log($_content);
+
+            $res = !$this->isAjax && is_null($res) ? $this->controller->getView() : $res;
+
+            $this->sendMessage($res);
+            return null;
 
         } catch (MBException $mb) {
             $mb->setHTTPService($this);
             return $mb->processException();
+        } catch (\Exception $e) {
+            $mb = new MBException($e->getMessage());
+            $mb->setHTTPService($this);
+            return $mb->processException();
         }
-    }
-
-    /**
-     * Callback for all the actions to be taken
-     *
-     */
-    public function doAction()
-    {
-        $res = null;
-
-        if ($this->isPOST())
-            $res = $this->controller->postRequest($this->content);
-
-        elseif ($this->isPUT())
-            $res = $this->controller->putRequest($this->content);
-
-        elseif ($this->isDELETE())
-            $res = $this->controller->deleteRequest($this->content);
-
-        else
-            $res = $this->controller->getRequest($this->qs);
-
-        $this->sendMessage($res);
-
-        return null;
     }
 
     /**
@@ -248,9 +304,9 @@ final class MocaBonita extends HTTPService
     /**
      * Insert shortcode to wp
      *
-     * @param array $shortCode The shortcode name
-     * @param array $object The object that will treat the shortcode
-     * @param array $method The callback method
+     * @param string $shortCode The shortcode name
+     * @param string $todo The object that will treat the shortcode
+     * @param string $method The callback method
      */
     public function insertShortCode($shortCode, $todo, $method){
         $object = $this->todo->getController($todo);
@@ -271,8 +327,7 @@ final class MocaBonita extends HTTPService
     /**
      * Relates the todo to a controller
      *
-     * @param string $controller The name of the controller
-     * @param string $todo The todo
+     * @param array $todo The todo
      */
     public function insertTODO(array $todo)
     {
@@ -282,8 +337,6 @@ final class MocaBonita extends HTTPService
     /**
      * Relates the todo to a controller
      *
-     * @param string $controller The name of the controller
-     * @param string $todo The todo
      */
     public function isPluginPage()
     {
@@ -292,6 +345,6 @@ final class MocaBonita extends HTTPService
             $this->isPluginPage = in_array($this->currentPage, $_pagesAvailable);
         }
 
-        return $this->isPluginPage ? $this->currentPage : false;
+        return $this->isPluginPage;
     }
 }

@@ -9,15 +9,15 @@
     License: GPLv2
 */
 
-//Caminho do composer autoload
-$_autoload = plugin_dir_path(__FILE__) . "vendor/autoload.php";
+//Verificar se o plugin esta sendo acessado através do wordpress
+if(!defined('ABSPATH'))
+    exit('O acesso direto não é permitido para esse plugin!');
 
-add_action('plugins_loaded', function() use ($_autoload){
+add_action('plugins_loaded', function(){
     try{
 
-        //Verificar se o plugin esta sendo acessado através do wordpress
-        if(!defined('ABSPATH'))
-            throw new Exception('O acesso direto não é permitido para esse plugin!');
+        //Caminho do composer autoload
+        $_autoload = plugin_dir_path(__FILE__) . "vendor/autoload.php";
 
         //Verificar se existe o autoload
         if(!file_exists($_autoload))
@@ -27,7 +27,7 @@ add_action('plugins_loaded', function() use ($_autoload){
         require_once $_autoload;
 
         //Instanciar o Moca Bonita
-        $_mocaBonita = new \MocaBonita\MocaBonita();
+        $_mocaBonita = new \MocaBonita\MocaBonita(true);
 
         //Configurações do MENU
         $_wpMenu = [
@@ -54,6 +54,15 @@ add_action('plugins_loaded', function() use ($_autoload){
                 $_mocaBonita,
                 'getContent',
             ],
+            [
+                'sps_uema',
+                'Teste',
+                'Teste',
+                'read',
+                'sps_teste',
+                $_mocaBonita,
+                'getContent',
+            ],
         ];
 
         //Incluir menu e submenu ao wordpress
@@ -63,11 +72,11 @@ add_action('plugins_loaded', function() use ($_autoload){
         $_css = [
             [
                 'path' => '/sps/Bootflat/css/bootstrap.min.css',
-                'page' => '*'
+                'page' => 'plugin'
             ],
             [
                 'path' => '/sps/Bootflat/bootflat/css/bootflat.min.css',
-                'page' => $_mocaBonita->isPluginPage(),
+                'page' => 'plugin',
             ],
         ];
 
@@ -75,12 +84,12 @@ add_action('plugins_loaded', function() use ($_autoload){
         $_js = [
             [
                 'path'   => '/sps/Bootflat/js/jquery-1.10.1.min.js',
-                'page'   => '*',
+                'page'   => 'sps_uema',
                 'footer' => !$_mocaBonita->isAdmin
             ],
             [
                 'path'   => '/sps/Bootflat/js/bootstrap.min.js',
-                'page'   => 'sps_uema',
+                'page'   => 'sps_candidato',
                 'footer' => !$_mocaBonita->isAdmin,
             ],
         ];
@@ -93,15 +102,37 @@ add_action('plugins_loaded', function() use ($_autoload){
         $_actionPost = [
             'sps_uema' => [
                 [
-                    'action' => 'create',
-                    'type'   => 'ajax',
-                    'admin'  => false,
+                    'action'  => 'create',
+                    'type'    => 'ajax',
+                    'admin'   => false,
+                    'request' => 'POST',
                 ],
                 [
-                    'action' => 'update',
-                    'type'   => 'post',
-                    'admin'  => true,
-                ]
+                    'action'  => 'path',
+                    'type'    => 'ajax',
+                    'admin'   => false,
+                    'request' => 'GET',
+                ],
+                [
+                    'action'  => 'request',
+                    'type'    => 'html',
+                    'admin'   => false,
+                    'request' => '*',
+                ],
+                [
+                    'action'  => 'getList',
+                    'type'    => 'html',
+                    'admin'   => false,
+                    'request' => '*',
+                ],
+            ],
+            'sps_teste' => [
+                [
+                    'action'  => 'create',
+                    'type'    => 'html',
+                    'admin'   => false,
+                    'request' => 'put',
+                ],
             ]
         ];
 
@@ -111,11 +142,13 @@ add_action('plugins_loaded', function() use ($_autoload){
         //Configurações de controller atribuidos aos seus respectivos todos
         $_todo = [
             'sps_uema' => '\SPS\controller\SPSController',
+            'sps_candidato' => '\SPS\controller\SPSCandidato',
+            'sps_teste' => '\SPS\controller\SPSTeste',
         ];
 
         $_mocaBonita->insertTODO($_todo);
 
-        $_mocaBonita->changeMessage('controller_not_found', 'Essa ação não foi definida');
+        $_mocaBonita->insertShortCode('moca_bonita', 'sps_teste', 'login');
 
         $_mocaBonita->launcher();
 

@@ -1,8 +1,10 @@
 <?php
 
 namespace MocaBonita\controller;
+use MocaBonita\view\View;
+
 /**
-* Interface for Moça Bonita controllers.
+* Class for Moça Bonita controllers.
 *
 * @author Rômulo Batista
 * @category WordPress
@@ -10,29 +12,180 @@ namespace MocaBonita\controller;
 * @copyright Copyright (c) 2015-2016 Núcleo de Tecnologia da Informação - NTI, Universidade Estadual do Maranhão - UEMA
 */
 
-interface Controller {
-	/**
-    * Treats the GET request
-    *
-    * @param array $get The GET array
-    */
-	public function getRequest(array $get);
-	/**
-    * Treats the POST request
-    *
-    * @param array $post The POST array
-    */
-	public function postRequest(array $post);
-	/**
-    * Treats the PUT request
-    *
-    * @param array $put The PUT array
-    */
-	public function putRequest(array $put);
-	/**
-    * Treats the DELETE request
-    *
-    * @param array $delete The DELETE array
-    */
-	public function deleteRequest(array $delete);
+abstract class Controller {
+
+    protected $view;
+    protected $requestMethod;
+    protected $requestData;
+    protected $requestParams;
+    protected $currentPage;
+    protected $currentAction;
+    protected $isAdmin;
+    protected $isAjax;
+    protected $isShortcode;
+
+    public function __construct(){
+        $this->view = new View();
+        $this->view->setTemplate('index');
+        $this->requestMethod = 'GET';
+        $this->requestData = [];
+        $this->requestParams = [];
+        $this->currentPage = 'no_page';
+        $this->currentAction = 'no_action';
+        $this->isAdmin = false;
+        $this->isAjax = false;
+        $this->isShortcode = false;
+    }
+
+	abstract public function indexAction();
+
+    /**
+     * @return View
+     */
+    public function getView()
+    {
+        return $this->view;
+    }
+
+    /**
+     * @param View $view
+     */
+    public function setView($view)
+    {
+        $this->view = $view;
+    }
+
+    /**
+     * @return string
+     */
+    public function getRequestMethod()
+    {
+        return $this->requestMethod;
+    }
+
+    /**
+     * @param string $requestMethod
+     */
+    public function setRequestMethod($requestMethod)
+    {
+        $this->requestMethod = $requestMethod;
+    }
+
+    /**
+     * @return array
+     */
+    public function getRequestData($key = null)
+    {
+        if(is_null($key))
+            return $this->requestData;
+        elseif(isset($this->requestData[$key]))
+            return $this->requestData[$key];
+        else
+            return [];
+    }
+
+    /**
+     * @param array $requestData
+     */
+    public function setRequestData($requestData)
+    {
+        $this->requestData = $requestData;
+    }
+
+    /**
+     * @return array
+     */
+    public function getRequestParams()
+    {
+        return $this->requestParams;
+    }
+
+    /**
+     * @param array $requestParams
+     */
+    public function setRequestParams($requestParams)
+    {
+        $this->requestParams = $requestParams;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getCurrentPage()
+    {
+        return $this->currentPage;
+    }
+
+    /**
+     * @param mixed $currentPage
+     */
+    public function setCurrentPage($currentPage)
+    {
+        $this->currentPage = $currentPage;
+    }
+
+    /**
+     * @return string
+     */
+    public function getCurrentAction()
+    {
+        return $this->currentAction;
+    }
+
+    /**
+     * @param string $currentAction
+     */
+    public function setCurrentAction($currentAction)
+    {
+        $this->currentAction = $currentAction;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isAdmin()
+    {
+        return $this->isAdmin;
+    }
+
+    /**
+     * @param boolean $isAdmin
+     */
+    public function setIsAdmin($isAdmin)
+    {
+        $this->isAdmin = $isAdmin;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isAjax()
+    {
+        return $this->isAjax;
+    }
+
+    /**
+     * @param boolean $isAjax
+     */
+    public function setIsAjax($isAjax)
+    {
+        $this->isAjax = $isAjax;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isShortcode()
+    {
+        return $this->isShortcode;
+    }
+
+    /**
+     * @param boolean $isShortcode
+     */
+    public function setIsShortcode($isShortcode)
+    {
+        $this->isShortcode = $isShortcode;
+    }
+
 }

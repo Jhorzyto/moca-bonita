@@ -11,7 +11,7 @@ namespace MocaBonita\model;
 
 use \Exception;
 
-abstract class ModelWPDB {
+abstract class ModelMB {
 	/**
     * Object of a wordpress database class
     *
@@ -216,5 +216,17 @@ abstract class ModelWPDB {
 	 */
 	public function escLike($query){
 		return $this->wpdb->esc_like($query);
+	}
+
+	public function getAll(array $columns = [], array $where = [])
+	{
+		try {
+            $_columns = empty($columns) ? '*' : implode(', ', $columns);
+            $_where = empty($where) ? '' : 'WHERE '.implode(' = ', $where);
+			$query = "SELECT {$_columns} FROM {$this->table} {$_where}";
+			return $this->getResultsT($query, ARRAY_A);
+		} catch (\Exception $e) {
+			throw $e;
+		}
 	}
 }

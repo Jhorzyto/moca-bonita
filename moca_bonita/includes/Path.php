@@ -2,12 +2,14 @@
 namespace MocaBonita\includes;
 
 define('plg_name'  , explode('/',  plugin_basename(__FILE__))[0]);
-define('plg_view'  , plg_name . '/view/');
-define('plg_js'    , plg_name . '/js/');
-define('plg_css'   , plg_name . '/style/');
-define('plg_images', plg_name . '/images/');
-define('plg_fonts' , plg_name . '/fonts/');
-define('plg_bower' , plg_name . '/bower_components/');
+define('plg_path'  , WP_PLUGIN_DIR . "/" . plg_name);
+define('plg_url'   , WP_PLUGIN_URL . "/" . plg_name);
+define('plg_view'  , plg_path . '/view/');
+define('plg_js'    , plg_url  . '/public/js/');
+define('plg_css'   , plg_url  . '/public/css/');
+define('plg_images', plg_url  . '/public/images/');
+define('plg_fonts' , plg_url  . '/public/fonts/');
+define('plg_bower' , plg_url  . '/public/bower_components/');
 
 /**
 * Find framework and plugin files.
@@ -21,10 +23,24 @@ define('plg_bower' , plg_name . '/bower_components/');
 class Path {
 
 	/**
-    * Constant that defines the plugin directory view files
+    * Constant that defines the plugin name files
     *
     * @var string
     */
+	const PLGNAME = plg_name;
+
+	/**
+	 * Constant that defines the plugin directory path
+	 *
+	 * @var string
+	 */
+	const PLGPATH = plg_path;
+
+	/**
+	 * Constant that defines the plugin directory view files
+	 *
+	 * @var string
+	 */
 	const PLGVIEW = plg_view;
 
 	/**

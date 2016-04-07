@@ -4,6 +4,7 @@ namespace MocaBonita\controller;
 
 use MocaBonita\includes\HTTPMethod;
 use MocaBonita\includes\json\JSONService;
+use MocaBonita\view\View;
 
 /**
 * Service to treat request/response requests.
@@ -73,14 +74,17 @@ abstract class HTTPService {
     *
     */
     public function __construct(){
-        $this->json = new JSONService();
-        $this->getRequest();
+        $this->requestMethod = $_SERVER['REQUEST_METHOD'];
+        $this->json          = new JSONService();
         $this->currentPage   = isset($_GET['page'])   ? $_GET['page']   : 'no_page';
         $this->currentAction = isset($_GET['action']) ? $_GET['action'] : null;
         $this->currentAction = $this->isGET()  && is_null($_GET['action']) ? 'index'     : $this->currentAction;
         $this->currentAction = !$this->isGET() && is_null($_GET['action']) ? 'no_action' : $this->currentAction;
         $this->isAdmin       = is_admin() && is_user_logged_in();
         $this->isAjax        = defined('DOING_AJAX') && DOING_AJAX;
+        $this->content       = [];
+        $this->qs            = [];
+        $this->getRequest();
     }
 
     /**
@@ -88,8 +92,8 @@ abstract class HTTPService {
     *
     */
     public function getRequest(){
-        if($this->isGET())
-            $this->qs = $_GET;
+
+        $this->qs = $_GET;
 
         if($this->isPOST()){
             $post = file_get_contents('php://input');
@@ -105,8 +109,9 @@ abstract class HTTPService {
 
             if($this->isJSON($put))
                 $this->content = $this->json->decode($put);
+
             else
-                $this->content = $put;
+                $this->content = [];
         }
 
         if($this->isDELETE()){
@@ -115,17 +120,8 @@ abstract class HTTPService {
             if($this->isJSON($delete))
                 $this->content = $this->json->decode($delete);
             else
-                $this->content = $delete;
+                $this->content = [];
         }
-    }
-
-    /**
-    * Set the request method
-    *
-    */
-    public function setRequestMethod(){
-        if(isset($_REQUEST))
-            $this->request = $_REQUEST;
     }
 
     /**
@@ -134,10 +130,7 @@ abstract class HTTPService {
     * @return True if the method is GET, false if it's not
     */
     public function isGET(){
-        if($_SERVER['REQUEST_METHOD'] === 'GET')
-            return true;
-
-        return false;
+        return $this->requestMethod === 'GET';
     }
 
     /**
@@ -146,10 +139,7 @@ abstract class HTTPService {
     * @return True if the method is POST, false if it's not
     */
     public function isPOST(){
-        if($_SERVER['REQUEST_METHOD'] === 'POST')
-            return true;
-
-        return false;
+        return $this->requestMethod === 'POST';
     }
 
     /**
@@ -158,10 +148,7 @@ abstract class HTTPService {
     * @return True if the method is PUT, false if it's not
     */
     public function isPUT(){
-        if($_SERVER['REQUEST_METHOD'] === 'PUT')
-            return true;
-
-        return false;
+        return $this->requestMethod === 'PUT';
     }
 
     /**
@@ -170,22 +157,7 @@ abstract class HTTPService {
     * @return True if the method is DELETE, false if it's not
     */
     public function isDELETE(){
-        if($_SERVER['REQUEST_METHOD'] === 'DELETE')
-            return true;
-
-        return false;
-    }
-
-    /**
-    * Check if something was requested
-    *
-    * @return True if something was requested, false if was not
-    */
-    public function isREQUEST(){
-        if(isset($this->request))
-            return true;
-
-        return false;
+        return $this->requestMethod === 'DELETE';
     }
 
     /**
@@ -214,11 +186,25 @@ abstract class HTTPService {
     * @return A message in JSON or TEXT
     */
     public function sendMessage($msg){
-        if(is_array($msg))
-            $this->json->sendJSON($msg, $this);
+        if($this->isAjax()){
+            if(is_array($msg))
+                $this->json->sendJSON($msg, $this);
 
-        elseif(is_null($msg) && $this->isAjax())
-            $this->json->sendJSON(HTTPMethod::getError(HTTPMethod::NO_CONTENT, 'Nenhum dado foi retornado!'), $this);
+            elseif(is_string($msg))
+                $this->json->sendJSON(['content' => $msg], $this);
+
+            else
+                $this->json->sendJSON(
+                    HTTPMethod::getError(HTTPMethod::REQUEST_UNAVAIABLE, 'Nenhum dado foi retornado!'),
+                    $this
+                );
+
+        } elseif ($msg instanceof View)
+            $msg->render();
+        elseif (is_string($msg))
+            echo $msg;
+        else
+            var_dump($msg);
     }
 
 }

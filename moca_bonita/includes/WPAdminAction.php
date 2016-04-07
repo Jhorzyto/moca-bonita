@@ -68,14 +68,6 @@ class WPAdminAction {
 		$this->actions = array();
 	}
 
-	/**
-    * Clone cannot be allowed
-    *
-    */
-	public function __clone(){
-        trigger_error('Clone is not allowed.', E_USER_ERROR);
-    }
-
     /**
     * Retrieve a unique instance
     * @return WPAdminAction
@@ -87,26 +79,6 @@ class WPAdminAction {
 		}
 
 		return self::$instance;
-	}
-
-	/**
-    * Add actions to wp
-    *
-    * @param array $actions The array of actions to be performed
-    * @param object $main The main object that will treat the actions
-    */
-	public function addAction($action, MocaBonita $main, $type, $isAdmin){
-        if($type == 'ajax' && $isAdmin)
-            WPAction::addAction("wp_ajax_{$action}", $main, 'doAction');
-
-        elseif($type == 'ajax' && !$isAdmin)
-            WPAction::addAction("wp_ajax_nopriv_{$action}", $main, 'doAction');
-
-        elseif($type != 'ajax' && $isAdmin)
-            WPAction::addAction("admin_post_{$action}", $main, 'doAction');
-
-        else
-            WPAction::addAction("admin_post_nopriv_{$action}", $main, 'doAction');
 	}
 
 }
