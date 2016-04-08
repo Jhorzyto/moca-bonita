@@ -202,7 +202,6 @@ final class MocaBonita extends HTTPService
                     throw new MBException($this->messages['action_not_defined']);
 
                 $_actionAttr['action']  = "{$this->currentAction}Action";
-                $_actionAttr['request'] = strtoupper($_actionAttr['request']);
 
                 if ($_actionAttr['admin'] && $this->isAdmin != 1)
                     throw new MBException($this->messages['actions_without_permission']);
@@ -263,10 +262,38 @@ final class MocaBonita extends HTTPService
      * @param array $wpMenuItems The menu items array
      * @param array $wpMenuItems The submenu items array
      */
-    public function addMenuItem(array $wpMenuItems, array $wpMenuSubItems)
+    public function addMenuItem($menuTitle, $capability, $menuSlug, $icon, $position = 100)
     {
-        $this->wpMenu->setMenuItems($wpMenuItems);
-        $this->wpMenu->setMenuSubItems($wpMenuSubItems);
+        $this->wpMenu->setMenuItems([
+            $menuTitle,
+            $menuTitle,
+            $capability,
+            $menuSlug,
+            $this,
+            'getContent',
+            $icon,
+            $position,
+        ]);
+    }
+
+    /**
+     * Add menu items to wp admin page
+     *
+     * @param array $wpMenuItems The menu items array
+     * @param array $wpMenuItems The submenu items array
+     */
+
+    public function addSubMenuItem($menuTitle, $capability, $menuSlug, $parentSlug = '')
+    {
+        $this->wpMenu->setMenuSubItems([
+            $parentSlug,
+            $menuTitle,
+            $menuTitle,
+            $capability,
+            $menuSlug,
+            $this,
+            'getContent',
+        ]);
     }
 
     /**
@@ -286,9 +313,9 @@ final class MocaBonita extends HTTPService
      *
      * @param array $css An array containing the style files
      */
-    public function insertCSS(array $css)
+    public function insertCSS($page, $path)
     {
-        $this->wpCode->setCss($css);
+        $this->wpCode->setCss($page, $path);
     }
 
     /**
@@ -296,9 +323,9 @@ final class MocaBonita extends HTTPService
      *
      * @param array $js An array containing the javascript files
      */
-    public function insertJS(array $js)
+    public function insertJS($page, $path, $footer = false)
     {
-        $this->wpCode->setJs($js);
+        $this->wpCode->setJs($page, $path, $footer);
     }
 
     /**
@@ -308,7 +335,7 @@ final class MocaBonita extends HTTPService
      * @param string $todo The object that will treat the shortcode
      * @param string $method The callback method
      */
-    public function insertShortCode($shortCode, $todo, $method){
+    public function insertShortCode($todo, $shortCode, $method){
         $object = $this->todo->getController($todo);
         if($object instanceof Controller)
             WPShortCode::addShortCode($shortCode, $todo, $object, $method);
@@ -319,9 +346,9 @@ final class MocaBonita extends HTTPService
      *
      * @param array $actions An array containing all actions to be taken
      */
-    public function generateActionPosts(array $actions = [])
+    public function generateActionPosts($page, $action, $admin = true, $request = 'GET', $type = 'html')
     {
-        $this->action->setActions($actions);
+        $this->action->setActions($page, $action, $admin, $request, $type);
     }
 
     /**
@@ -329,9 +356,9 @@ final class MocaBonita extends HTTPService
      *
      * @param array $todo The todo
      */
-    public function insertTODO(array $todo)
+    public function insertTODO($todo, $class)
     {
-        $this->todo->setTodo($todo);
+        $this->todo->setTodo($todo, $class);
     }
 
     /**

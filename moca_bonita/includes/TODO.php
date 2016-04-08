@@ -31,10 +31,9 @@ class TODO {
     /**
      * @param string $todo
      */
-    public function setTodo(array $todo)
+    public function setTodo($todo, $class)
     {
-        foreach($todo as $todoName => $controllerName)
-            $this->processTodo($controllerName, $todoName);
+       	$this->processTodo($class, $todo);
     }
 
 	/**
@@ -53,7 +52,7 @@ class TODO {
     */
 	private function processTodo($controller, $todo){
 		if(!isset($this->todo[$todo]))
-			$this->todo[$todo] = array('controller' => $controller, 'todo' => $todo);
+			$this->todo[$todo] = ['controller' => $controller, 'todo' => $todo];
 	}
 
 	/**

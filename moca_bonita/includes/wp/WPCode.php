@@ -18,13 +18,13 @@ class WPCode
      *
      * @var array
      */
-    private $css;
+    private $css = [];
     /**
      * JS array
      *
      * @var array
      */
-    private $js;
+    private $js = [];
 
     /**
      * @return array
@@ -37,10 +37,15 @@ class WPCode
     /**
      * @param array $css
      */
-    public function setCss(array $css)
+    public function setCss($page, $path)
     {
-        foreach($css as $value)
-            $this->css[$value['page']][] = $value;
+        if(!isset($this->css[$page]))
+            $this->css[$page] = [];
+
+        $this->css[$page][] = [
+            'path' => $path,
+            'page' => $page
+        ];
     }
 
     /**
@@ -54,10 +59,16 @@ class WPCode
     /**
      * @param array $js
      */
-    public function setJs(array $js)
+    public function setJs($page, $path, $footer)
     {
-        foreach($js as $value)
-            $this->js[$value['page']][] = $value;
+        if(!isset($this->js[$page]))
+            $this->js[$page] = [];
+
+        $this->js[$page][] = [
+            'path'   => $path,
+            'page'   => $page,
+            'footer' => $footer
+        ];
     }
 
     /**

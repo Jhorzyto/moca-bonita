@@ -16,7 +16,7 @@ class SPSTeste extends Controller
         return $this;
     }
 
-    public function loginShortcode(){
-        $this->view->setView($this->view->getTemplate(), 'sps_uema', 'index');
+    public function loginShortcode($attrs, $content){
+        return $content;
     }
 }

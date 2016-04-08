@@ -47,9 +47,8 @@ class WPMenu {
     * @param array $wpMenuItems An array with items
     */
 	public function setMenuItems(array $wpMenuItems){
-		$this->wpMenuItems = $wpMenuItems;
-        foreach($this->wpMenuItems as &$wpMenuItem)
-            $this->wpPagesAvailable[] = $wpMenuItem[3];
+		$this->wpMenuItems[]      = $wpMenuItems;
+        $this->wpPagesAvailable[] = $wpMenuItems[3];
 	}
 
     /**
@@ -84,9 +83,8 @@ class WPMenu {
     * @param array $wpMenuSubItems An array with items
     */
 	public function setMenuSubItems(array $wpMenuSubItems){
-		$this->wpMenuSubItems = $wpMenuSubItems;
-        foreach($this->wpMenuSubItems as &$wpMenuSubItem)
-            $this->wpPagesAvailable[] = $wpMenuSubItem[4];
+		$this->wpMenuSubItems[] = $wpMenuSubItems;
+        $this->wpPagesAvailable[] = $wpMenuSubItems[4];
 	}
 
 	/**

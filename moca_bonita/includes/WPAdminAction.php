@@ -27,7 +27,7 @@ class WPAdminAction {
     *
     * @var string
     */
-	private $actions;
+	private $actions = [];
 
 	/**
 	 * @return string
@@ -55,9 +55,17 @@ class WPAdminAction {
 	/**
 	 * @param string $actions
 	 */
-	public function setActions($actions)
+	public function setActions($page, $action, $admin, $request, $type)
 	{
-		$this->actions = $actions;
+        if(!isset($this->actions[$page]))
+            $this->actions[$page] = [];
+
+		$this->actions[$page][] = [
+            'action'  => $action,
+            'type'    => $type,
+            'admin'   => $admin,
+            'request' => $request,
+        ];
 	}
 
 	/**

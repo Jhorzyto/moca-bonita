@@ -1,0 +1,28 @@
+#!/usr/bin/env php
+<?php
+
+if(!isset($argv))
+    exit("No have arguments!\n");
+
+require_once './console/TerminalListener.php';
+require_once './console/Help.php';
+
+echo "\n";
+echo "Alguns comandos para usar no abigail";
+echo "\n\n";
+
+if(!isset($argv[1])){
+    \MocaBonita\console\Help::getHelp();
+    echo "Escolha uma opção: ";
+    $argv[1] = trim(\MocaBonita\console\TerminalListener::listener());
+}
+
+switch($argv[1]){
+    case 'init' :
+        echo 'chegou!\n';
+    break;
+
+    default :
+        echo "Nenhum argumento foi enviado!\n";
+    break;
+}

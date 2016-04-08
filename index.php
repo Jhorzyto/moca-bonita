@@ -11,8 +11,9 @@
 
 //Verificar se o plugin esta sendo acessado através do wordpress
 if(!defined('ABSPATH'))
-    exit('O acesso direto não é permitido para esse plugin!');
+    exit('O acesso direto não é permitido para esse plugin!\n');
 
+//Inicializar o plugin após o wordpress definir
 add_action('plugins_loaded', function(){
     try{
 
@@ -29,130 +30,44 @@ add_action('plugins_loaded', function(){
         //Instanciar o Moca Bonita
         $_mocaBonita = new \MocaBonita\MocaBonita(true);
 
-        //Configurações do MENU
-        $_wpMenu = [
-            [
-                'SPS Uema',
-                'SPS Uema',
-                'read',
-                'sps_uema',
-                $_mocaBonita,
-                'getContent',
-                'dashicons-welcome-widgets-menus',
-                2,
-            ]
-        ];
-
-        //Configurações do SubMenu
-        $_wpSubMenu = [
-            [
-                'sps_uema',
-                'Candidatos',
-                'Candidatos',
-                'read',
-                'sps_candidato',
-                $_mocaBonita,
-                'getContent',
-            ],
-            [
-                'sps_uema',
-                'Teste',
-                'Teste',
-                'read',
-                'sps_teste',
-                $_mocaBonita,
-                'getContent',
-            ],
-        ];
-
         //Incluir menu e submenu ao wordpress
-        $_mocaBonita->addMenuItem($_wpMenu, $_wpSubMenu);
+        $_mocaBonita->addMenuItem('SPS Uema', 'read', 'sps_uema', 'dashicons-welcome-widgets-menus', 2);
 
-        //Configurações do CSS
-        $_css = [
-            [
-                'path' => '/sps/Bootflat/css/bootstrap.min.css',
-                'page' => 'plugin'
-            ],
-            [
-                'path' => '/sps/Bootflat/bootflat/css/bootflat.min.css',
-                'page' => 'plugin',
-            ],
-        ];
+        $_mocaBonita->addMenuItem('Plugin Teste', 'read', 'plugin_teste', 'dashicons-welcome-widgets-menus', 2);
 
-        //Configurações do JS
-        $_js = [
-            [
-                'path'   => '/sps/Bootflat/js/jquery-1.10.1.min.js',
-                'page'   => 'sps_uema',
-                'footer' => !$_mocaBonita->isAdmin
-            ],
-            [
-                'path'   => '/sps/Bootflat/js/bootstrap.min.js',
-                'page'   => 'sps_candidato',
-                'footer' => !$_mocaBonita->isAdmin,
-            ],
-        ];
+        $_mocaBonita->addSubMenuItem('Candidatos', 'read', 'sps_candidato', 'sps_uema');
+        $_mocaBonita->addSubMenuItem('Teste', 'read', 'sps_teste', 'sps_uema');
 
         //Inserir CSS e JS ao wordpress
-        $_mocaBonita->insertCSS($_css);
-        $_mocaBonita->insertJS($_js);
+        $_mocaBonita->insertCSS('plugin', '/sps/Bootflat/css/bootstrap.min.css');
+        $_mocaBonita->insertCSS('plugin', '/sps/Bootflat/bootflat/css/bootflat.min.css');
 
-        //Configurações dos actions post/put/delete
-        $_actionPost = [
-            'sps_uema' => [
-                [
-                    'action'  => 'create',
-                    'type'    => 'ajax',
-                    'admin'   => false,
-                    'request' => 'POST',
-                ],
-                [
-                    'action'  => 'path',
-                    'type'    => 'ajax',
-                    'admin'   => false,
-                    'request' => 'GET',
-                ],
-                [
-                    'action'  => 'request',
-                    'type'    => 'html',
-                    'admin'   => false,
-                    'request' => '*',
-                ],
-                [
-                    'action'  => 'getList',
-                    'type'    => 'html',
-                    'admin'   => false,
-                    'request' => '*',
-                ],
-            ],
-            'sps_teste' => [
-                [
-                    'action'  => 'create',
-                    'type'    => 'html',
-                    'admin'   => false,
-                    'request' => 'put',
-                ],
-            ]
-        ];
+        $_mocaBonita->insertJS('sps_uema', '/sps/Bootflat/js/jquery-1.10.1.min.js');
+        $_mocaBonita->insertJS('sps_candidato', '/sps/Bootflat/js/bootstrap.min.js', !$_mocaBonita->isAdmin);
 
         //Adicionar os actionsPost ao wordpress
-        $_mocaBonita->generateActionPosts($_actionPost);
+        $_mocaBonita->generateActionPosts('sps_uema', 'create');
+        $_mocaBonita->generateActionPosts('sps_uema', 'path', false, 'GET', 'ajax');
+        $_mocaBonita->generateActionPosts('sps_uema', 'request', false, '*');
+        $_mocaBonita->generateActionPosts('sps_uema', 'getList', false, '*');
+        $_mocaBonita->generateActionPosts('sps_teste', 'create', false, 'PUT');
 
-        //Configurações de controller atribuidos aos seus respectivos todos
-        $_todo = [
-            'sps_uema' => '\SPS\controller\SPSController',
-            'sps_candidato' => '\SPS\controller\SPSCandidato',
-            'sps_teste' => '\SPS\controller\SPSTeste',
-        ];
+        $_mocaBonita->generateActionPosts('plugin_teste', 'create', false, 'GET', 'http');
 
-        $_mocaBonita->insertTODO($_todo);
+        //Adicionar os 'Todos' ao wordpress
+        $_mocaBonita->insertTODO('sps_uema', '\SPS\controller\SPSController');
+        $_mocaBonita->insertTODO('sps_candidato', '\SPS\controller\SPSCandidato');
+        $_mocaBonita->insertTODO('sps_teste', '\SPS\controller\SPSTeste');
+        $_mocaBonita->insertTODO('plugin_teste', '\SPS\controller\PluginTesteController');
 
-        $_mocaBonita->insertShortCode('moca_bonita', 'sps_teste', 'login');
+        //Adicionar shortcode ao wordpress
+        $_mocaBonita->insertShortCode('sps_teste', 'moca_bonita', 'login');
 
+        //Lançar o plugin para o wordpress
         $_mocaBonita->launcher();
 
     } catch (\Exception $e){
+        //Exibir exceção
         echo $e->getMessage();
     }
 });
