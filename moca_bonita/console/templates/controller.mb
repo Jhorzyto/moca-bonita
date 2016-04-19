@@ -1,0 +1,33 @@
+<?php
+namespace %plugin_namespace%\controller;
+
+use MocaBonita\controller\Controller;
+use %plugin_namespace%\model\ExemploModel;
+
+class ExemploController extends Controller
+{
+
+    public function indexAction()
+    {
+        $model = new ExemploModel();
+        $this->view->setVars(['dados' => $model->getAll()]);
+        $this->view->setPage('exemplo');
+        $this->view->setAction('exemplo_view');
+        //$this->view->setView($this->view->getTemplate() ,'exemplo', 'exemplo_view', ['dados' => $model->getAll()]);
+    }
+
+    public function createAction()
+    {
+        return $this->getRequestData();
+    }
+
+    public function updateAction()
+    {
+        return $this->getRequestData();
+    }
+
+    public function deleteAction()
+    {
+        return $this->getRequestData();
+    }
+}

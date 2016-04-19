@@ -1,28 +1,29 @@
 #!/usr/bin/env php
 <?php
 
-if(!isset($argv))
-    exit("No have arguments!\n");
+if(!isset($argv) || php_sapi_name() != 'cli')
+    exit("Executavel apenas por linha de comando!\n");
 
 require_once './console/TerminalListener.php';
 require_once './console/Help.php';
+require_once './console/InitPlugin.php';
 
-echo "\n";
-echo "Alguns comandos para usar no abigail";
-echo "\n\n";
+if(!isset($argv[1]))
+    $argv[1] = "no_argv";
 
-if(!isset($argv[1])){
-    \MocaBonita\console\Help::getHelp();
-    echo "Escolha uma opção: ";
-    $argv[1] = trim(\MocaBonita\console\TerminalListener::listener());
-}
+do{
 
-switch($argv[1]){
-    case 'init' :
-        echo 'chegou!\n';
-    break;
+    switch($argv[1]){
 
-    default :
-        echo "Nenhum argumento foi enviado!\n";
-    break;
-}
+        case 'init' :
+            (new \MocaBonita\console\InitPlugin())->run($argv);
+        break;
+
+        default :
+            (new \MocaBonita\console\Help())->run($argv);
+        break;
+    }
+
+} while($argv[1] != 'exit');
+
+exit();
