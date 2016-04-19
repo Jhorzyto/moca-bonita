@@ -1,1 +1,0 @@
-<main><?= $this->getContent(); ?></main>

@@ -1,14 +1,13 @@
 <?php
-namespace SPS\model;
+namespace %plugin_namespace%\model;
 
 use MocaBonita\model\ModelMB;
 
-class Teste extends ModelMB {
+class ExemploModel extends ModelMB {
 
     public function __construct()
     {
         parent::__construct();
         $this->table = 'wp_posts';
     }
-
 }

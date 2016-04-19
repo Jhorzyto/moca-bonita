@@ -1,0 +1,12 @@
+{
+  "name": "%plugin_name%",
+  "description": "Um plugin wordpress construido usando o Moça Bonita.",
+  "license": "GPLv2",
+  "authors": [],
+  "autoload": {
+    "psr-4": {
+      "MocaBonita\\" : "moca_bonita",
+      "%plugin_namespace%\\" : "./"
+    }
+  }
+}

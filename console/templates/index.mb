@@ -1,0 +1,59 @@
+<?php
+/*
+    Plugin Name: %plugin_name%
+    Plugin URI: https://github.com/Jhorzyto/moca-bonita
+    Description: Um plugin wordpress construido usando o Moça Bonita.
+    Version: 1.0
+    Author: Moça Bonita
+    Author URI: https://github.com/Jhorzyto/moca-bonita
+    License: GPLv2
+*/
+
+//Verificar se o plugin esta sendo acessado através do wordpress
+if(!defined('ABSPATH'))
+    exit('O acesso direto não é permitido para esse plugin!\n');
+
+//Inicializar o plugin após o wordpress definir
+add_action('plugins_loaded', function(){
+    try{
+
+        //Caminho do composer autoload
+        $_autoload = plugin_dir_path(__FILE__) . "vendor/autoload.php";
+
+        //Verificar se existe o autoload
+        if(!file_exists($_autoload))
+            throw new Exception('O composer autoload não foi instalado no plugin!');
+
+        //Incluir o autoload
+        require_once $_autoload;
+
+        //Instanciar o Moca Bonita
+        $_mocaBonita = new \MocaBonita\MocaBonita(true);
+
+        //Incluir menu e submenu ao wordpress
+        $_mocaBonita->addMenuItem('%plugin_name%', 'read', '%plugin_label%', 'dashicons-welcome-widgets-menus', 2);
+
+        $_mocaBonita->addSubMenuItem('Exemplo', 'read', 'plugin_exemplo', '%plugin_label%');
+
+        //Inserir CSS e JS ao wordpress
+        $_mocaBonita->insertCSS('plugin', '/bootstrap.min.css');
+
+        $_mocaBonita->insertJS('sps_uema', '/jquery-1.10.1.min.js');
+
+        //Adicionar os actionsPost ao wordpress
+        $_mocaBonita->generateActionPosts('%plugin_label%', 'create', true, 'POST');
+        $_mocaBonita->generateActionPosts('%plugin_label%', 'update', true, 'PUT');
+        $_mocaBonita->generateActionPosts('%plugin_label%', 'delete', true, 'DELETE');
+
+        //Adicionar os 'Todos' ao wordpress
+        $_mocaBonita->insertTODO('%plugin_label%', '%plugin_controller%');
+        $_mocaBonita->insertTODO('plugin_exemplo', '%plugin_controller%');
+
+        //Lançar o plugin para o wordpress
+        $_mocaBonita->launcher();
+
+    } catch (\Exception $e){
+        //Exibir exceção
+        echo $e->getMessage();
+    }
+});
