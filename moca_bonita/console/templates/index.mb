@@ -47,6 +47,7 @@ add_action('plugins_loaded', function(){
 
         //Adicionar os 'Todos' ao wordpress
         $_mocaBonita->insertTODO('%plugin_label%', '%plugin_controller%');
+        $_mocaBonita->insertTODO('plugin_exemplo', '%plugin_controller%');
 
         //Lançar o plugin para o wordpress
         $_mocaBonita->launcher();
