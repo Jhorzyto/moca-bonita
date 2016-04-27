@@ -262,17 +262,17 @@ final class MocaBonita extends HTTPService
      * @param array $wpMenuItems The menu items array
      * @param array $wpMenuItems The submenu items array
      */
-    public function addMenuItem($menuTitle, $capability, $menuSlug, $icon, $position = 100)
+    public function addMenuItem($menuTitle, $capability, $menuSlug, $icon, $position = 100, $removeSubmenu = true)
     {
         $this->wpMenu->setMenuItems([
-            $menuTitle,
-            $menuTitle,
-            $capability,
-            $menuSlug,
-            $this,
-            'getContent',
-            $icon,
-            $position,
+            'menu_title'     => $menuTitle,
+            'capability'     => $capability,
+            'menu_slug'      => $menuSlug,
+            'object'         => $this,
+            'method'         => 'getContent',
+            'icon'           => $icon,
+            'position'       => $position,
+            'remove_submenu' => $removeSubmenu
         ]);
     }
 
@@ -286,13 +286,12 @@ final class MocaBonita extends HTTPService
     public function addSubMenuItem($menuTitle, $capability, $menuSlug, $parentSlug = '')
     {
         $this->wpMenu->setMenuSubItems([
-            $parentSlug,
-            $menuTitle,
-            $menuTitle,
-            $capability,
-            $menuSlug,
-            $this,
-            'getContent',
+            'parent_slug' => $parentSlug,
+            'menu_title'  => $menuTitle,
+            'capability'  => $capability,
+            'menu_slug'   => $menuSlug,
+            'object'      => $this,
+            'method'      => 'getContent',
         ]);
     }
 
@@ -368,7 +367,7 @@ final class MocaBonita extends HTTPService
     public function isPluginPage()
     {
         if(is_null($this->isPluginPage)) {
-            $_pagesAvailable = $this->wpMenu->getPagesAvailable();
+            $_pagesAvailable    = $this->wpMenu->getPagesAvailable();
             $this->isPluginPage = in_array($this->currentPage, $_pagesAvailable);
         }
 
