@@ -262,7 +262,7 @@ final class MocaBonita extends HTTPService
      * @param array $wpMenuItems The menu items array
      * @param array $wpMenuItems The submenu items array
      */
-    public function addMenuItem($menuTitle, $capability, $menuSlug, $icon, $position = 100, $removeSubmenu = true)
+    public function addMenuItem($menuTitle, $capability, $menuSlug, $icon, $position = 100, $removeSubmenu = false)
     {
         $this->wpMenu->setMenuItems([
             'menu_title'     => $menuTitle,
