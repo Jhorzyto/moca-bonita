@@ -15,7 +15,7 @@ use MocaBonita\includes\wp\WPShortCode;
 /**
  * Performs the basic functions of the framework. Receives each request, passes to a controller that treats client requests and respond to them.
  *
- * @author Rômulo Batista
+ * @author Rômulo Batista | Jhordan Lima
  * @category WordPress
  * @package moca_bonita\controller
  * @copyright Copyright (c) 2015-2016 Núcleo de Tecnologia da Informação - NTI, Universidade Estadual do Maranhão - UEMA
@@ -144,22 +144,22 @@ final class MocaBonita extends HTTPService
         if($this->isPluginPage()){
             $this->wpCode->addStyle('plugin');
             $this->wpCode->addJS('plugin');
+
+            if ($this->isAdmin == 1) {
+                if($this->isAjax == 1)
+                    WPAction::addAction("wp_ajax_{$this->currentAction}", $this, 'getContent');
+                else
+                    WPAction::addAction("admin_post_{$this->currentAction}", $this, 'getContent');
+            } else {
+                if($this->isAjax == 1)
+                    WPAction::addAction("wp_ajax_nopriv_{$this->currentAction}", $this, 'getContent');
+                else
+                    WPAction::addAction("admin_post_nopriv_{$this->currentAction}", $this, 'getContent');
+            }
         }
 
         $this->wpCode->addStyle($this->currentPage);
         $this->wpCode->addJS($this->currentPage);
-
-        if ($this->isAdmin == 1) {
-            if($this->isAjax == 1)
-                WPAction::addAction("wp_ajax_{$this->currentAction}", $this, 'getContent');
-            else
-                WPAction::addAction("admin_post_{$this->currentAction}", $this, 'getContent');
-        } else {
-            if($this->isAjax == 1)
-                WPAction::addAction("wp_ajax_nopriv_{$this->currentAction}", $this, 'getContent');
-            else
-                WPAction::addAction("admin_post_nopriv_{$this->currentAction}", $this, 'getContent');
-        }
 
         WPShortCode::processShortCode($this->wpCode, [
             'requestMethod' => $this->requestMethod,
