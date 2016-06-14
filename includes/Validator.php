@@ -19,7 +19,7 @@ class Validator
         'double_not_double'   => "O atributo '%attr' não é um double!",
         'array_not_array'     => "O atributo '%attr' não é um array!",
         'array_min_element'   => "O atributo '%attr' deve ter no minimo '%min' elementos!",
-        'array_max_element'   => "O atributo '%attr' deve ter no máximo '%min' elementos!",
+        'array_max_element'   => "O atributo '%attr' deve ter no máximo '%max' elementos!",
         'object_not_object'   => "O atributo '%attr' não é um objeto!",
         'object_instance_of'  => "O atributo '%attr' não é uma instância de '%class'!",
         'attr_not_found'      => "O atributo '%attr' não foi encontrado!",
