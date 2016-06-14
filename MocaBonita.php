@@ -234,7 +234,7 @@ final class MocaBonita extends HTTPService
             $this->controller->getView()->setAction($this->currentAction);
 
             ob_start();
-            $res = $this->controller->$_actionAttr['action']();
+            $res = $this->controller->{$_actionAttr['action']}();
             $_content = ob_get_contents();
             ob_end_clean();
 
