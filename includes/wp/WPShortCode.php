@@ -54,7 +54,7 @@ class WPShortCode {
                     $shortCode['object']->getView()->setAction($page);
 
                     ob_start();
-                    $res = $shortCode['object']->$shortCode['method']($atts, $content, $tag);
+                    $res = $shortCode['object']->{$shortCode['method']}($atts, $content, $tag);
                     $_content = ob_get_contents();
                     ob_end_clean();
 
