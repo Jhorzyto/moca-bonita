@@ -218,12 +218,13 @@ abstract class ModelMB {
 		return $this->wpdb->esc_like($query);
 	}
 
-	public function getAll(array $columns = [], array $where = [])
+	public function getAll(array $columns = [], array $where = [], array $orderByAsc = [])
 	{
 		try {
             $_columns = empty($columns) ? '*' : implode(', ', $columns);
-            $_where = empty($where) ? '' : 'WHERE '.implode(' = ', $where);
-			$query = "SELECT {$_columns} FROM {$this->table} {$_where}";
+            $_where = empty($where) ? '' : ' WHERE '.implode(' = ', $where);
+            $_orderByAsc = empty($orderByAsc) ? '' : ' ORDER BY '.implode(', ', $orderByAsc);
+			$query = "SELECT {$_columns} FROM {$this->table}{$_where}{$_orderByAsc}";
 			return $this->getResultsT($query, ARRAY_A);
 		} catch (\Exception $e) {
 			throw $e;
