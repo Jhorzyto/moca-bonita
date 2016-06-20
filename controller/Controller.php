@@ -95,9 +95,14 @@ abstract class Controller {
     /**
      * @return array
      */
-    public function getRequestParams()
+    public function getRequestParams($key = null)
     {
-        return $this->requestParams;
+        if(is_null($key))
+            return $this->requestParams;
+        elseif(isset($this->requestParams[$key]))
+            return $this->requestParams[$key];
+        else
+            return null;
     }
 
     /**
