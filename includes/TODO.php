@@ -47,22 +47,24 @@ class TODO
         if (!isset($this->service[$page]))
             return null;
 
-        $serviceName = $this->service[$page]['service'];
-        $service     = new $serviceName();
+        foreach ($this->service[$page] as $serviceData) {
 
-        if (!$service instanceof Service)
-            throw new \Exception("Service Invalid");
+            $serviceName = $serviceData['service'];
+            $service     = new $serviceName();
 
-        foreach ($this->service[$page]['method'] as $method){
-            $methodName  = "{$method}Dispatcher";
+            if (!$service instanceof Service)
+                throw new \Exception("Service Invalid");
 
-            if(!method_exists($service, $methodName))
-                throw new \Exception("Method Invalid");
-            
-            $service->initialize($requestData);
-            Service::setServicesData($this->service[$page], $service->{$methodName}());
+            foreach ($serviceData['method'] as $method){
+                $methodName  = "{$method}Dispatcher";
+
+                if(!method_exists($service, $methodName))
+                    throw new \Exception("Method Invalid");
+
+                $service->initialize($requestData);
+                Service::setServicesData($serviceData, $service->{$methodName}());
+            }
         }
-
     }
 
     /**

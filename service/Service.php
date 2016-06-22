@@ -161,7 +161,7 @@ abstract class Service {
 
     protected function redirect($url, array $params = []){
         if(is_string($url)){
-            $url .= !empty($params) ? http_build_query($params) : "";
+            $url .= !empty($params) ? "?" . http_build_query($params) : "";
             header("Location: {$url}");
             exit();
         }

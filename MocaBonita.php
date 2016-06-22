@@ -181,11 +181,19 @@ final class MocaBonita extends HTTPService
                 'messages' => $this->messages,
                 'isDevelopment' => $this->isDevelopment,
             ]);
-            
+
         } catch (\Exception $e) {
+            $this->isPluginPage = false;
             $mb = new MBException($e->getMessage());
             $mb->setHTTPService($this);
-            $mb->processException();
+
+            $callback = function() use ($mb){
+                $mb->processException();
+            };
+
+            WPAction::addActionCallback('admin_notices', $callback);
+            WPAction::addActionCallback("wp_ajax_{$this->currentAction}", $callback);
+            WPAction::addActionCallback("wp_ajax_nopriv_{$this->currentAction}", $callback);
         }
     }
 
