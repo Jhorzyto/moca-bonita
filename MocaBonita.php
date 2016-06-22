@@ -136,38 +136,48 @@ final class MocaBonita extends HTTPService
      */
     public function launcher()
     {
-        WPAction::addAction('admin_menu', $this, 'insertMenuItems');
-
-        $this->wpCode->addStyle('*');
-        $this->wpCode->addJS('*');
-
-        if($this->isPluginPage()){
-            $this->wpCode->addStyle('plugin');
-            $this->wpCode->addJS('plugin');
-
-            if ($this->isAdmin == 1) {
-                if($this->isAjax == 1)
-                    WPAction::addAction("wp_ajax_{$this->currentAction}", $this, 'getContent');
-                else
-                    WPAction::addAction("admin_post_{$this->currentAction}", $this, 'getContent');
-            } else {
-                if($this->isAjax == 1)
-                    WPAction::addAction("wp_ajax_nopriv_{$this->currentAction}", $this, 'getContent');
-                else
-                    WPAction::addAction("admin_post_nopriv_{$this->currentAction}", $this, 'getContent');
+        try {
+            WPAction::addAction('admin_menu', $this, 'insertMenuItems');
+    
+            $this->wpCode->addStyle('*');
+            $this->wpCode->addJS('*');
+            $this->todo->getService('*');
+    
+            if($this->isPluginPage()){
+                $this->wpCode->addStyle('plugin');
+                $this->wpCode->addJS('plugin');
+                $this->todo->getService('plugin');
+    
+                if ($this->isAdmin == 1) {
+                    if($this->isAjax == 1)
+                        WPAction::addAction("wp_ajax_{$this->currentAction}", $this, 'getContent');
+                    else
+                        WPAction::addAction("admin_post_{$this->currentAction}", $this, 'getContent');
+                } else {
+                    if($this->isAjax == 1)
+                        WPAction::addAction("wp_ajax_nopriv_{$this->currentAction}", $this, 'getContent');
+                    else
+                        WPAction::addAction("admin_post_nopriv_{$this->currentAction}", $this, 'getContent');
+                }
             }
+    
+            $this->wpCode->addStyle($this->currentPage);
+            $this->wpCode->addJS($this->currentPage);
+            $this->todo->getService($this->currentPage);
+    
+            WPShortCode::processShortCode($this->wpCode, [
+                'requestMethod' => $this->requestMethod,
+                'requestParams' => $this->qs,
+                'isAdmin' => $this->isAdmin,
+                'messages' => $this->messages,
+                'isDevelopment' => $this->isDevelopment,
+            ]);
+            
+        } catch (\Exception $e) {
+            $mb = new MBException($e->getMessage());
+            $mb->setHTTPService($this);
+            $mb->processException();
         }
-
-        $this->wpCode->addStyle($this->currentPage);
-        $this->wpCode->addJS($this->currentPage);
-
-        WPShortCode::processShortCode($this->wpCode, [
-            'requestMethod' => $this->requestMethod,
-            'requestParams' => $this->qs,
-            'isAdmin' => $this->isAdmin,
-            'messages' => $this->messages,
-            'isDevelopment' => $this->isDevelopment,
-        ]);
     }
 
     /**
@@ -360,6 +370,16 @@ final class MocaBonita extends HTTPService
         $this->todo->setTodo($todo, $class);
     }
 
+    /**
+     * Insert service to plugin
+     *
+     * @param array $todo The todo
+     */
+    public function insertService($page, $class, array $method)
+    {
+        $this->todo->setService($page, $class, $method);
+    }
+    
     /**
      * Relates the todo to a controller
      *

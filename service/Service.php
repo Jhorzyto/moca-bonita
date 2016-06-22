@@ -1,20 +1,18 @@
 <?php
 
-namespace MocaBonita\controller;
-use MocaBonita\view\View;
+namespace MocaBonita\service;
 
 /**
-* Class for Moça Bonita controllers.
-*
-* @author Jhordan Lima
-* @category WordPress
-* @package moca_bonita\controller
-* @copyright Copyright (c) 2016
-*/
+ * Class for Moça Bonita services.
+ *
+ * @author Jhordan Lima
+ * @category WordPress
+ * @package moca_bonita\service
+ * @copyright Copyright (c) 2016
+ */
 
-abstract class Controller {
+abstract class Service {
 
-    protected $view;
     protected $requestMethod;
     protected $requestData;
     protected $requestParams;
@@ -22,11 +20,8 @@ abstract class Controller {
     protected $currentAction;
     protected $isAdmin;
     protected $isAjax;
-    protected $isShortcode;
 
     public function __construct(){
-        $this->view = new View();
-        $this->view->setTemplate('index');
         $this->requestMethod = 'GET';
         $this->requestData = [];
         $this->requestParams = [];
@@ -34,25 +29,6 @@ abstract class Controller {
         $this->currentAction = 'no_action';
         $this->isAdmin = false;
         $this->isAjax = false;
-        $this->isShortcode = false;
-    }
-
-	abstract public function indexAction();
-
-    /**
-     * @return View
-     */
-    public function getView()
-    {
-        return $this->view;
-    }
-
-    /**
-     * @param View $view
-     */
-    public function setView($view)
-    {
-        $this->view = $view;
     }
 
     /**
@@ -177,22 +153,6 @@ abstract class Controller {
         $this->isAjax = $isAjax;
     }
 
-    /**
-     * @return boolean
-     */
-    public function isShortcode()
-    {
-        return $this->isShortcode;
-    }
-
-    /**
-     * @param boolean $isShortcode
-     */
-    public function setIsShortcode($isShortcode)
-    {
-        $this->isShortcode = $isShortcode;
-    }
-
     protected function redirect($url, array $params = []){
         if(is_string($url)){
             $url .= !empty($params) ? http_build_query($params) : "";
@@ -200,4 +160,5 @@ abstract class Controller {
             exit();
         }
     }
+
 }
