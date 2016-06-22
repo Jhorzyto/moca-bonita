@@ -20,6 +20,7 @@ abstract class Service {
     protected $currentAction;
     protected $isAdmin;
     protected $isAjax;
+    private static $servicesData = [];
 
     public function __construct(){
         $this->requestMethod = 'GET';
@@ -153,12 +154,34 @@ abstract class Service {
         $this->isAjax = $isAjax;
     }
 
+    public final function initialize($data){
+        foreach ($data as $method => $value)
+            $this->{$method}($value);
+    }
+
     protected function redirect($url, array $params = []){
         if(is_string($url)){
             $url .= !empty($params) ? http_build_query($params) : "";
             header("Location: {$url}");
             exit();
         }
+    }
+
+    /**
+     * @return mixed
+     */
+    public static function getServicesData()
+    {
+        return self::$servicesData;
+    }
+
+    /**
+     * @param mixed $servicesData
+     */
+    public static function setServicesData(array $service, $servicesData)
+    {
+        $service['service_data'] = $servicesData;
+        self::$servicesData[]    = $service;
     }
 
 }

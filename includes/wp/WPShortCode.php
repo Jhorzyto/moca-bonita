@@ -45,9 +45,7 @@ class WPShortCode {
                 $shortCode['method'] = "{$shortCode['method']}Shortcode";
 
                 if(method_exists($shortCode['object'], $shortCode['method'])){
-                    $shortCode['object']->setRequestMethod($plugin['requestMethod']);
-                    $shortCode['object']->setRequestParams($plugin['requestParams']);
-                    $shortCode['object']->setIsAdmin($plugin['isAdmin']);
+                    $shortCode['object']->initialize($plugin['requestData']);
                     $shortCode['object']->setIsShortcode(true);
                     $shortCode['object']->getView()->setTemplate('shortcode');
                     $shortCode['object']->getView()->setPage('shortcode');
@@ -76,7 +74,6 @@ class WPShortCode {
                     if($plugin['isDevelopment'])
                         echo "Shortcode: {$shortCode['shortcode']}; Method: {$shortCode['method']}; Todo: {$shortCode['todo']}.";
                 }
-
 
             });
     }

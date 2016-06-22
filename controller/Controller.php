@@ -192,6 +192,11 @@ abstract class Controller {
     {
         $this->isShortcode = $isShortcode;
     }
+    
+    public final function initialize($data){
+        foreach ($data as $method => $value)
+            $this->{$method}($value);
+    }
 
     protected function redirect($url, array $params = []){
         if(is_string($url)){

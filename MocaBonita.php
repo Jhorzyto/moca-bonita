@@ -78,6 +78,7 @@ final class MocaBonita extends HTTPService
      */
     public $isDevelopment;
 
+    private $requestData;
 
     /**
      * Class constructor
@@ -92,6 +93,16 @@ final class MocaBonita extends HTTPService
         $this->action = WPAdminAction::singleton();
         $this->todo = new TODO();
         $this->isDevelopment = $isDevelopment;
+        
+        $this->requestData = [
+            'setRequestMethod' => $this->requestMethod,
+            'setRequestData' => $this->content,
+            'setRequestParams' => $this->qs,
+            'setCurrentPage' => $this->currentPage,
+            'setCurrentAction' => $this->currentAction,
+            'setIsAdmin' => $this->isAdmin,
+            'setIsAjax' => $this->isAjax,
+        ];
 
         if($isDevelopment)
             $this->messages = [
@@ -141,12 +152,12 @@ final class MocaBonita extends HTTPService
     
             $this->wpCode->addStyle('*');
             $this->wpCode->addJS('*');
-            $this->todo->getService('*');
+            $this->todo->getService('*', $this->requestData);
     
             if($this->isPluginPage()){
                 $this->wpCode->addStyle('plugin');
                 $this->wpCode->addJS('plugin');
-                $this->todo->getService('plugin');
+                $this->todo->getService('plugin', $this->requestData);
     
                 if ($this->isAdmin == 1) {
                     if($this->isAjax == 1)
@@ -163,12 +174,10 @@ final class MocaBonita extends HTTPService
     
             $this->wpCode->addStyle($this->currentPage);
             $this->wpCode->addJS($this->currentPage);
-            $this->todo->getService($this->currentPage);
+            $this->todo->getService($this->currentPage, $this->requestData);
     
             WPShortCode::processShortCode($this->wpCode, [
-                'requestMethod' => $this->requestMethod,
-                'requestParams' => $this->qs,
-                'isAdmin' => $this->isAdmin,
+                'requestData' => $this->requestData,
                 'messages' => $this->messages,
                 'isDevelopment' => $this->isDevelopment,
             ]);
@@ -233,13 +242,7 @@ final class MocaBonita extends HTTPService
                     'request' => 'GET',
                 ];
 
-            $this->controller->setRequestMethod($this->requestMethod);
-            $this->controller->setRequestData($this->content);
-            $this->controller->setRequestParams($this->qs);
-            $this->controller->setCurrentPage($this->currentPage);
-            $this->controller->setCurrentAction($this->currentAction);
-            $this->controller->setIsAdmin($this->isAdmin);
-            $this->controller->setIsAjax($this->isAjax);
+            $this->controller->initialize($this->requestData);
             $this->controller->getView()->setPage($this->currentPage);
             $this->controller->getView()->setAction($this->currentAction);
 

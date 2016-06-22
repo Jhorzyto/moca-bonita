@@ -42,7 +42,7 @@ class TODO
     /**
      * @return array
      */
-    public function getService($page)
+    public function getService($page, $requestData)
     {
         if (!isset($this->service[$page]))
             return null;
@@ -58,8 +58,9 @@ class TODO
 
             if(!method_exists($service, $methodName))
                 throw new \Exception("Method Invalid");
-
-            yield $service->{$methodName}();
+            
+            $service->initialize($requestData);
+            Service::setServicesData($this->service[$page], $service->{$methodName}());
         }
 
     }
