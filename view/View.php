@@ -142,11 +142,7 @@ class View {
             $page = "<div class='notice notice-error'><p>O arquivo <strong>{$this->path}</strong> não foi encontrado!</p></div>";
 
         $this->setContent($page);
-        return $this->applyView();
-    }
-
-    private function applyView(){
-
+        
         $this->processPath('template');
 
         if(file_exists($this->path)){
@@ -158,6 +154,7 @@ class View {
             $page = "<div class='notice notice-error'><p>O arquivo <strong>{$this->path}</strong> de template não foi encontrado!</p></div>";
 
         echo $page;
+        
         return true;
     }
 
