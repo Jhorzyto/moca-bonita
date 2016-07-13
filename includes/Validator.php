@@ -105,6 +105,8 @@ class Validator
                     ));
 
             }
+            
+            return $data;
 
         };
 
@@ -134,6 +136,8 @@ class Validator
                             self::$messages_return['numeric_max_value']
                     ));
             }
+            
+            return $data;
 
         };
 
@@ -163,6 +167,8 @@ class Validator
                             self::$messages_return['numeric_max_value']
                     ));
             }
+            
+            return $data;
 
         };
 
@@ -192,6 +198,8 @@ class Validator
                             self::$messages_return['numeric_max_value']
                     ));
             }
+
+            return $data;
 
         };
 
@@ -223,6 +231,8 @@ class Validator
                     ));
             }
 
+            return $data;
+
         };
 
         self::$rules['object'] = function($data, $attr, array $params){
@@ -244,6 +254,8 @@ class Validator
                     ));
             }
 
+            return $data;
+
         };
 
         return self::$rules;
@@ -257,7 +269,7 @@ class Validator
             self::$rules[$rule] = $callback;
     }
 
-    static private function processRule($rule, $data, $attr){
+    static private function processRule($rule, &$data, $attr){
         $rules_param = explode(":", $rule);
 
         foreach($rules_param as &$params)
@@ -272,7 +284,8 @@ class Validator
                 ));
 
             $function = self::$rules[$rules_param[0]];
-            $function($data, $attr, $rules_param);
+            $dataReturn = $function($data, $attr, $rules_param);
+            $data = !is_null($dataReturn) ? $dataReturn : $data;
         } catch(Exception $e){
             if(!isset(self::$messages[$attr]))
                 self::$messages[$attr] = [];
