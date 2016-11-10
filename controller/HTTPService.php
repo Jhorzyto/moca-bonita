@@ -78,8 +78,8 @@ abstract class HTTPService {
         $this->json          = new JSONService();
         $this->currentPage   = isset($_GET['page'])   ? $_GET['page']   : 'no_page';
         $this->currentAction = isset($_GET['action']) ? $_GET['action'] : null;
-        $this->currentAction = $this->isGET()  && is_null($_GET['action']) ? 'index'     : $this->currentAction;
-        $this->currentAction = !$this->isGET() && is_null($_GET['action']) ? 'no_action' : $this->currentAction;
+        $this->currentAction = $this->isGET()  && is_null($this->currentAction) ? 'index'     : $this->currentAction;
+        $this->currentAction = !$this->isGET() && is_null($this->currentAction) ? 'no_action' : $this->currentAction;
         $this->isAdmin       = is_admin() && is_user_logged_in();
         $this->isAjax        = defined('DOING_AJAX') && DOING_AJAX;
         $this->content       = [];
